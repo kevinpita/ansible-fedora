@@ -1,0 +1,25 @@
+- name: Set the maximum number of parallel dnf downloads
+  become: true
+  community.general.ini_file:
+    path: /etc/dnf/dnf.conf
+    section: main
+    option: max_parallel_downloads
+    value: "{{ system_dnf_max_parallel_downloads }}"
+    no_extra_spaces: true
+    mode: '0644'
+    state: present
+- name: Set dnf to select the fastest mirror
+  become: true
+  community.general.ini_file:
+    path: /etc/dnf/dnf.conf
+    section: main
+    option: fastestmirror
+    value: true
+    no_extra_spaces: true
+    mode: '0644'
+    state: present
+- name: Upgrade all dnf packages
+  become: true
+  ansible.builtin.dnf:
+    name: '*'
+    state: latest

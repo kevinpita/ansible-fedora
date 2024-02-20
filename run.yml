@@ -1,0 +1,5 @@
+- name: Play for setting up a Fedora workstation
+  hosts: all
+  gather_facts: false
+  roles:
+    - role: system

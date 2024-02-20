@@ -1,0 +1,2 @@
+- name: Run dnf tasks
+  ansible.builtin.import_tasks: dnf.yml
