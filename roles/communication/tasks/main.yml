@@ -1,0 +1,5 @@
+- name: Install communication packages
+  become: true
+  ansible.builtin.dnf:
+    name: "{{ communication_packages }}"
+    state: present
