@@ -1,0 +1,5 @@
+ide_jetbrains_toolbox_url: https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release
+ide_jetbrains_toolbox_app_name: jetbrains-toolbox
+ide_jetbrains_toolbox_app_dir: "{{ lookup('env', 'HOME') }}/applications"
+
+ide_vscode_microsoft_key: https://packages.microsoft.com/keys/microsoft.asc

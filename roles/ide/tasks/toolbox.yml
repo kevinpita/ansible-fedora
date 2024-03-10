@@ -1,0 +1,61 @@
+- name: Check if JetBrains Toolbox is already installed
+  ansible.builtin.stat:
+    path: "{{ ide_jetbrains_toolbox_app_dir }}/{{ ide_jetbrains_toolbox_app_name }}"
+  register: toolbox_stat
+
+- name: Skip JetBrains Toolbox if it's already installed
+  ansible.builtin.meta: end_play
+  when: toolbox_stat.stat.exists
+
+- name: Create a temp folder
+  ansible.builtin.tempfile:
+    state: directory
+  register: tmpdir
+
+- name: Get latest JetBrains Toolbox download link
+  ansible.builtin.uri:
+    url: "{{ ide_jetbrains_toolbox_url }}"
+    return_content: true
+    method: GET
+  register: response
+
+- name: Extract JetBrains Toolbox download link
+  ansible.builtin.set_fact:
+    jetbrains_toolbox_download_link: "{{ response.json['TBA'][0]['downloads']['linux']['link'] }}"
+
+- name: Download latest JetBrains Toolbox
+  ansible.builtin.get_url:
+    url: "{{ jetbrains_toolbox_download_link }}"
+    dest: "{{ tmpdir.path }}/{{ ide_jetbrains_toolbox_app_name }}.tar.gz"
+    mode: "0755"
+
+- name: Extract JetBrains Toolbox App
+  ansible.builtin.unarchive:
+    src: "{{ tmpdir.path }}/{{ ide_jetbrains_toolbox_app_name }}.tar.gz"
+    dest: "{{ tmpdir.path }}"
+    remote_src: true
+
+- name: Ensure App target directory exists
+  ansible.builtin.file:
+    path: "{{ ide_jetbrains_toolbox_app_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Copy JetBrains Toolbox executable to the target directory
+  ansible.builtin.copy:
+    src: "{{ tmpdir.path }}/jetbrains-toolbox-{{ response.json['TBA'][0]['build'] }}/jetbrains-toolbox"
+    dest: "{{ ide_jetbrains_toolbox_app_dir }}/{{ ide_jetbrains_toolbox_app_name }}"
+    mode: "0755"
+
+- name: Remove the temp folder
+  ansible.builtin.file:
+    path: "{{ tmpdir.path }}"
+    state: absent
+
+- name: Run JetBrains Toolbox
+  ansible.builtin.command:
+    cmd: "{{ ide_jetbrains_toolbox_app_dir }}/{{ ide_jetbrains_toolbox_app_name }}"
+  register: toolbox_result
+  changed_when: false
+  failed_when:
+    - toolbox_result.rc != 0

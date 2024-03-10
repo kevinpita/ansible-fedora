@@ -1,0 +1,5 @@
+- name: Run jetbrains toolbox tasks
+  ansible.builtin.import_tasks: toolbox.yml
+
+- name: Run Visual Studio Code tasks
+  ansible.builtin.import_tasks: vscode.yml
